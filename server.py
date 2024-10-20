@@ -22,7 +22,6 @@ from marker_api.model.schema import (
 )
 from marker_api.demo import demo_ui
 from typing import Union
-from pydantic import BaseModel
 
 # Initialize logging
 configure_logging()
@@ -65,24 +64,19 @@ def server():
     return HealthResponse(message="Welcome to Marker-api", type=ServerType.simple)
 
 
-class SingleConverter(BaseModel):
-    max_pages: int = 10
-    start_page: int = 0
-    langs: Union[str, None] = None
-    batch_multiplier: int = 2
-
-
 # Endpoint to convert a single PDF to markdown
 @app.post("/convert", response_model=ConversionResponse)
-async def convert_pdf_to_markdown(pdf_file: UploadFile, options: SingleConverter):
+async def convert_pdf_to_markdown(pdf_file: UploadFile, max_pages: Union[int, None] = 10,
+                                  start_page: Union[int, None] = 0, langs: Union[str, None] = None,
+                                  batch_multiplier: Union[int, None] =  2):
     """
     Endpoint to convert a single PDF to markdown.
     """
     logger.debug(f"Received file: {pdf_file.filename}")
     file = await pdf_file.read()
     response = process_pdf_file(file, pdf_file.filename, model_list,
-                                max_pages=options.max_pages, start_page=options.start_page,
-                                langs=options.langs, batch_multiplier=options.batch_multiplier)
+                                max_pages=max_pages, start_page=start_page,
+                                langs=langs, batch_multiplier=batch_multiplier)
     return ConversionResponse(status="Success", result=response)
 
 
