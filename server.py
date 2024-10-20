@@ -21,6 +21,8 @@ from marker_api.model.schema import (
     ServerType,
 )
 from marker_api.demo import demo_ui
+from typing import Union
+from pydantic import BaseModel
 
 # Initialize logging
 configure_logging()
@@ -52,7 +54,7 @@ app.add_middleware(
     allow_credentials=True,
 )
 
-app = gr.mount_gradio_app(app, demo_ui, path="")
+app = gr.mount_gradio_app(app, demo_ui, path="/ui")
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -63,15 +65,24 @@ def server():
     return HealthResponse(message="Welcome to Marker-api", type=ServerType.simple)
 
 
+class SingleConverter(BaseModel):
+    max_pages: int = 10
+    start_page: int = 0
+    langs: Union[str, None] = None
+    batch_multiplier: int = 2
+
+
 # Endpoint to convert a single PDF to markdown
 @app.post("/convert", response_model=ConversionResponse)
-async def convert_pdf_to_markdown(pdf_file: UploadFile):
+async def convert_pdf_to_markdown(pdf_file: UploadFile, options: SingleConverter):
     """
     Endpoint to convert a single PDF to markdown.
     """
     logger.debug(f"Received file: {pdf_file.filename}")
     file = await pdf_file.read()
-    response = process_pdf_file(file, pdf_file.filename, model_list)
+    response = process_pdf_file(file, pdf_file.filename, model_list,
+                                max_pages=options.max_pages, start_page=options.start_page,
+                                langs=options.langs, batch_multiplier=options.batch_multiplier)
     return ConversionResponse(status="Success", result=response)
 
 
