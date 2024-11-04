@@ -7,9 +7,6 @@ readme = "README.md"
 packages = [{include = "marker_api"}]
 
 [tool.poetry.dependencies]
-torch = "2.5.0"
-torchvision = "0.20.0"
-torchaudio = "2.5.0"
 python = ">=3.10,<3.13"
 transformers = "4.45.2"
 fastapi = "^0.115.0"

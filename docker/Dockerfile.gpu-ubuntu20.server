@@ -44,7 +44,9 @@ WORKDIR $APP_DIR
 COPY ./ ./
 RUN chown -R $UID:$GID $APP_DIR
 USER $UID:$GID
-RUN python3.12 -m venv $APP_DIR/.venv && . $APP_DIR/.venv/bin/activate && pip install --no-cache-dir .
+RUN python3.12 -m venv $APP_DIR/.venv && . $APP_DIR/.venv/bin/activate && \
+  pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
+  pip install --no-cache-dir .
 
 # Copy the project files into the Docker image
 
