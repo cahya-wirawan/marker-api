@@ -20,7 +20,7 @@ from marker_api.model.schema import (
     HealthResponse,
     ServerType,
 )
-from marker_api.demo import demo_ui
+from marker_api.demo import marker_ui
 from typing import Union
 
 # Initialize logging
@@ -53,7 +53,7 @@ app.add_middleware(
     allow_credentials=True,
 )
 
-app = gr.mount_gradio_app(app, demo_ui, path="/ui")
+app = gr.mount_gradio_app(app, marker_ui, path="/ui")
 
 
 @app.get("/health", response_model=HealthResponse)
