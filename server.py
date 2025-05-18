@@ -56,7 +56,6 @@ app.add_middleware(
     allow_credentials=True,
 )
 
-app = gr.mount_gradio_app(app, marker_ui, path="/ui")
 
 
 @app.get("/health", response_model=HealthResponse)
@@ -68,7 +67,7 @@ def server():
 
 
 # Endpoint to convert a single PDF to markdown
-@app.post("/api/convert", response_model=ConversionResponse)
+@app.post("/convert", response_model=ConversionResponse)
 async def convert_pdf_to_markdown(pdf_file: UploadFile, max_pages: Union[int, None] = 10,
                                   start_page: Union[int, None] = 0, langs: Union[str, None] = None,
                                   batch_multiplier: Union[int, None] =  2):
@@ -96,7 +95,7 @@ async def convert_pdf_to_markdown(pdf_file: UploadFile, max_pages: Union[int, No
 
 
 # Endpoint to convert multiple PDFs to markdown
-@app.post("/api/batch_convert", response_model=BatchConversionResponse)
+@app.post("/batch_convert", response_model=BatchConversionResponse)
 async def convert_pdfs_to_markdown(pdf_files: List[UploadFile] = File(...)):
     """
     Endpoint to convert multiple PDFs to markdown.
@@ -117,6 +116,7 @@ async def convert_pdfs_to_markdown(pdf_files: List[UploadFile] = File(...)):
     responses = await process_files(pdf_files)
     return BatchConversionResponse(results=responses)
 
+app = gr.mount_gradio_app(app, marker_ui, path="/ui", root_path="/ui")
 
 # Main function to run the server
 def main():

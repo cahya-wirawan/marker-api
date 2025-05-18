@@ -74,7 +74,7 @@ def parse_document(input_file_path, request: gr.Request):
     try:
         marker_api_url = os.environ.get("MARKER_API_URL", MARKER_API_URL)
         marker_api_url = request.headers.get("host", marker_api_url)
-        post_url = f"{marker_api_url}/api/convert?max_pages=30&batch_multiplier=8"
+        post_url = f"{marker_api_url}/convert?max_pages=30&batch_multiplier=8"
         # Determine the MIME type of the file
         mime_type, _ = mimetypes.guess_type(input_file_path)
         if not mime_type:
