@@ -22,6 +22,9 @@ from marker_api.model.schema import (
 )
 from marker_api.demo import marker_ui
 from typing import Union
+from pathlib import Path
+import pickle
+
 
 # Initialize logging
 configure_logging()
@@ -73,11 +76,23 @@ async def convert_pdf_to_markdown(pdf_file: UploadFile, max_pages: Union[int, No
     Endpoint to convert a single PDF to markdown.
     """
     logger.debug(f"Received file: {pdf_file.filename}")
-    file = await pdf_file.read()
-    response = process_pdf_file(file, pdf_file.filename, model_list,
-                                max_pages=max_pages, start_page=start_page,
-                                langs=langs, batch_multiplier=batch_multiplier)
-    return ConversionResponse(status="Success", result=response)
+    data_dir = Path("./data/cache")
+    data_dir.mkdir(parents=True, exist_ok=True)
+    pkl_path = data_dir / f"{pdf_file.filename}-{max_pages}-{start_page}.pkl"
+    if pkl_path.exists():
+        logger.debug(f"Loading cached file: {pkl_path}")
+        with open(pkl_path, "rb") as f:
+            response = pickle.load(f)
+        return ConversionResponse(status="Success", result=response)
+    else:
+        file = await pdf_file.read()
+        response = process_pdf_file(file, pdf_file.filename, model_list,
+                                    max_pages=max_pages, start_page=start_page,
+                                    langs=langs, batch_multiplier=batch_multiplier)
+        with open(pkl_path, "wb") as f:
+            pickle.dump(response, f)
+        logger.debug(f"Saved cached file: {pkl_path}")
+        return ConversionResponse(status="Success", result=response)
 
 
 # Endpoint to convert multiple PDFs to markdown
