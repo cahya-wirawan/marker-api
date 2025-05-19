@@ -74,12 +74,12 @@ async def convert_pdf_to_markdown(pdf_file: UploadFile, max_pages: Union[int, No
     """
     Endpoint to convert a single PDF to markdown.
     """
-    logger.debug(f"Received file: {pdf_file.filename}")
-    data_dir = Path("./data/cache")
-    data_dir.mkdir(parents=True, exist_ok=True)
-    pkl_path = data_dir / f"{pdf_file.filename}-{max_pages}-{start_page}.pkl"
+    logger.info(f"Received file: {pdf_file.filename}")
+    cache_dir = Path("/data/cache")
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    pkl_path = cache_dir / f"{Path(pdf_file.filename).name}-{max_pages}-{start_page}.pkl"
     if pkl_path.exists():
-        logger.debug(f"Loading cached file: {pkl_path}")
+        logger.info(f"Loading cached file: {pkl_path}")
         with open(pkl_path, "rb") as f:
             response = pickle.load(f)
         return ConversionResponse(status="Success", result=response)
