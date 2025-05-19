@@ -42,7 +42,8 @@ RUN addgroup --gid $GID llm-adm && adduser --uid $UID --ingroup llm-adm --disabl
 ARG APP_DIR=/app
 WORKDIR $APP_DIR
 COPY ./ ./
-RUN chown -R $UID:$GID $APP_DIR
+RUN mkdir /data
+RUN chown -R $UID:$GID $APP_DIR /data
 USER $UID:$GID
 RUN python3.12 -m venv $APP_DIR/.venv && . $APP_DIR/.venv/bin/activate && \
   pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 && \
